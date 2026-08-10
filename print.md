@@ -97,6 +97,92 @@ push_warning("此方法已弃用")
 
 - `Node.print_tree()` / `Node.print_tree_pretty()`：打印当前节点及其子节点的场景树结构（pretty 版本使用 Unicode 树形字符，更美观）。
 
+## 字符串格式化输出（与 print 结合使用）
+
+GDScript 提供了强大的字符串格式化能力，常与 `print` / `prints` 等一起使用，实现更清晰、可控的输出。
+
+主要有三种方式：
+
+### 1. `%` 运算符（printf 风格，推荐用于数值格式化）
+
+使用 `%` 运算符 + 格式说明符。多个值时必须传入**数组**。
+
+```gdscript
+# 基本用法
+print("玩家: %s, 分数: %d" % ["Alice", 100])
+# 输出: 玩家: Alice, 分数: 100
+
+print("血量: %.1f%%" % 85.5)
+# 输出: 血量: 85.5%   （%% 表示字面 %）
+```
+
+#### 常用格式说明符
+
+| 说明符 | 含义 | 示例 |
+|--------|------|------|
+| `%s` | 任意类型（调用 `str()`） | `%s` % any |
+| `%d` | 十进制整数（浮点会向下取整） | `%d` % 3.9 → 3 |
+| `%f` | 浮点数 | `%f` % 3.14159 |
+| `%x` / `%X` | 十六进制（小写/大写） | `%x` % 255 → ff |
+| `%o` | 八进制 | `%o` % 8 → 10 |
+| `%c` | 单个 Unicode 字符 | `%c` % 65 → A |
+| `%v` | 向量（Vector2/3 等） | `%v` % Vector2(1, 2) |
+
+#### 常用修饰符
+
+- **宽度**：`%10d` → 右对齐，宽度至少 10
+- **补零**：`%05d` → `00042`
+- **精度**：`%.2f` → 保留 2 位小数
+- **左对齐**：`%-10s`
+- **正号**：`%+d` → 正数也显示 +
+- **动态宽度/精度**：`%*.*f` % [宽度, 精度, 值]
+
+```gdscript
+print("%10.2f" % 3.14159)     # "      3.14"
+print("%05d" % 42)            # "00042"
+print("%-8s|%d" % ["Name", 1]) # "Name    |1"
+print("%0*d" % [4, 7])         # "0007"  （动态宽度）
+```
+
+**注意**：格式字符串中的占位符数量必须与传入数组的元素数量严格匹配。
+
+### 2. `String.format()` 方法（命名/索引占位符）
+
+更适合使用**键名**或索引进行替换，可读性更好。
+
+```gdscript
+# 使用字典（推荐）
+print("玩家: {name}, 分数: {score}".format({"name": "Alice", "score": 100}))
+
+# 使用数组 + 索引
+print("玩家: {0}, 分数: {1}".format(["Alice", 100]))
+
+# 混合
+print("玩家: {0}, 分数: {score}".format({"0": "Alice", "score": 100}))
+```
+
+`format()` 本身**不支持**数值的宽度/精度控制，需要嵌套 `%` 运算符：
+
+```gdscript
+var text = "分数: {score}".format({"score": "%.2f" % 98.765})
+print(text)  # 分数: 98.77
+```
+
+### 3. 简单字符串拼接
+
+```gdscript
+print("玩家: " + name + ", 分数: " + str(score))
+```
+
+简单但可读性较差，且无法方便地控制数值格式。
+
+### 使用建议
+
+- **需要精确控制数字显示**（小数位数、补零、对齐）→ 优先用 `%` 运算符。
+- **模板中有多个命名字段** → 用 `String.format()`。
+- 日常快速调试 → `prints()` 或简单 `print()` 即可。
+- 复杂输出可组合使用：先用 `%` 或 `format()` 生成字符串，再交给 `print` / `print_rich` 等。
+
 ## 使用建议
 
 - 日常调试优先使用 `print` / `prints` / `printt`。
@@ -108,5 +194,6 @@ push_warning("此方法已弃用")
 ## 参考
 
 - [官方 Output panel 文档](https://docs.godotengine.org/en/stable/tutorials/scripting/debug/output_panel.html)
+- [GDScript 格式字符串官方教程](https://docs.godotengine.org/en/stable/tutorials/scripting/gdscript/gdscript_format_string.html)
 - [@GlobalScope](https://docs.godotengine.org/en/stable/classes/class_@globalscope.html)
 - [@GDScript](https://docs.godotengine.org/en/stable/classes/class_@gdscript.html)
