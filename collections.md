@@ -40,6 +40,46 @@ print(arr2.size()) # 长度
 | `duplicate(deep=false)`                       | 复制（深/浅）              |
 | `+` 运算符                                    | 拼接两个数组（返回新数组） |
 
+### 函数式方法示例（map / filter / sort）
+
+这些方法非常常用，通常配合 Lambda 使用：
+
+```gdscript
+var numbers = [5, 2, 8, 1, 9, 3]
+
+# map：对每个元素做转换，返回新数组
+var doubled = numbers.map(func(x): return x * 2)
+print(doubled)  # [10, 4, 16, 2, 18, 6]
+
+# filter：筛选满足条件的元素，返回新数组
+var even = numbers.filter(func(x): return x % 2 == 0)
+print(even)     # [2, 8]
+
+# sort：原地排序（默认升序）
+var sorted_nums = numbers.duplicate()  # 先复制，避免修改原数组
+sorted_nums.sort()
+print(sorted_nums)  # [1, 2, 3, 5, 8, 9]
+
+# sort_custom：自定义排序规则
+var people = [
+    {"name": "Alice", "age": 30},
+    {"name": "Bob", "age": 25},
+    {"name": "Charlie", "age": 35}
+]
+
+# 按 age 升序
+people.sort_custom(func(a, b): return a.age < b.age)
+print(people)  # Bob(25) → Alice(30) → Charlie(35)
+
+# 按 name 降序
+people.sort_custom(func(a, b): return a.name > b.name)
+```
+
+**注意**：
+- `map` 和 `filter` 返回**新数组**，不会修改原数组。
+- `sort` / `sort_custom` 是**原地修改**，如果需要保留原数组，请先 `duplicate()`。
+- 自定义排序函数应返回 `true` 表示 `a` 应该排在 `b` 前面。
+
 **Typed Array** 示例：
 
 ```gdscript
